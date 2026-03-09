@@ -1,0 +1,223 @@
+//thread 2
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+
+void *func_thread(void *arg);
+
+int main(){
+
+    pthread_t t1;
+    int n = 5;
+    int *t_ret;
+
+    pthread_create(&t1, NULL, func_thread, &n);
+
+
+    pthread_join(t1, (void**)&t_ret); //void** -> a pointer to a pointer
+
+    printf("Thread returned: %d\n", *t_ret);
+
+    free(t_ret);
+
+    return 0;
+}
+
+void *func_thread(void *arg){       //void* means it can return any type
+
+    int *v = (int*)arg;
+
+    int *result = malloc(sizeof(int));
+    *result = (*v) * 5;
+
+    return result;
+}
+
+
+
+thread 3:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+
+void *func_thread(void *arg);
+int num = 5;
+void *t_ret;
+
+int main() {
+    pthread_t t1;
+
+
+    pthread_create(&t1, NULL, func_thread, &num);
+    
+    pthread_join(t1, &t_ret);
+
+    printf("Thread returned: %d\n", *(int *)t_ret);
+    free(t_ret);  // free heap memory allocated in thread
+
+    return 0;
+}
+
+void *func_thread(void *arg) {
+    int *n = (int *)arg;
+    int *result = malloc(sizeof(int));
+
+    if (*n % 2 == 0) {
+        *result = (*n) * (*n);       // square if even
+    } else {
+        *result = (*n) * (*n) * (*n); // cube if odd
+    }
+
+    printf("Operation completed\n");
+    pthread_exit(result);
+}
+
+
+//thread4
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+
+void *func_thread(void *v);
+int *t_ret;
+
+int main(){
+	pthread_t t1;
+	int n;
+    printf("Enter the size of the array:\n");
+    scanf("%d",&n);
+
+	pthread_create(&t1, NULL, func_thread, &n);
+    
+	pthread_join(t1,(void**)&t_ret);
+	
+    for(int i=0;i<n;i++){
+        printf("a[%d]: %d\n",i,t_ret[i]);
+    }
+
+	free(t_ret);
+
+	return 0;
+}
+void *func_thread(void *v){
+
+    int n = *(int*)v;
+    int *a=malloc(sizeof(int)*(n));
+    
+    for(int i=0;i<n;i++){
+        printf("Enter value in a[%d]:\n",i);
+        scanf("%d",&a[i]);
+    }
+    return a;
+}
+
+
+//thread 5
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+
+void *t_func1(void *arg);
+void *t_func2(void *arg1);
+
+int t_id[]={1,2};
+
+int a=10;
+
+int b=5;
+
+int main(){
+
+	int a1[]={t_id[0],a,b};
+	int a2[]={t_id[1],a,b};
+
+
+	pthread_t t1;
+	pthread_t t2;
+	
+    pthread_create(&t1,NULL,t_func1,(void *)a1);
+	pthread_create(&t2,NULL,t_func2,(void *)a2);
+	
+    pthread_join(t1,NULL);
+	pthread_join(t2,NULL);
+	
+	return 0;
+}
+
+void *t_func1(void *arg){
+	int *x=arg;
+	printf("Entered in Thread :%d\n",x[0]);
+	sleep(1);
+	int add=x[1]+x[2];
+	printf("ADD :%d\n",add);
+	printf("Addition Done by Thread %d...\n",x[0]);
+}
+
+void *t_func2(void *arg1){
+	int *y=arg1;
+	printf("Entered in Thread :%d\n",y[0]);
+	sleep(1);
+	int sub=y[1]-y[2];
+	printf("SUB :%d\n",sub);
+	printf("Substraction Done by Thread %d...\n",y[0]);
+}
+
+//thread 6
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+
+int t_id[]={1,2,3,4};
+void *t_func(void *id);
+
+int main(){
+	pthread_t t[4];
+
+    for(int i=0;i<4;i++){
+        pthread_create(&t[i],NULL,t_func,&t_id[i]);
+    }
+	
+	for(int i=0;i<4;i++){
+		pthread_join(t[i],NULL);
+	}
+	
+	return 0;
+}
+
+void *t_func(void *id){
+
+    int *n = (int*)id;
+	printf("Entered in Thread %d...\n",*n);
+	
+    for(int i=0;i<5;i++){
+		printf("Thread %d Turn %d\n",*n,i);
+		sleep(1);
+	}
+
+	printf("Ending Thread %d...\n",*n);
+}
+
+
+Sync:
+Example:
+
+count = 100
+
+Thread 1 reads count → reg1 = 100
+
+Thread 2 reads count → reg2 = 100
+
+Thread 1 increments reg1 → 101
+
+Thread 2 increments reg2 → 101
+
+Thread 1 writes 101 to count
+
+Thread 2 writes 101 to count
