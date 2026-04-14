@@ -1,0 +1,5 @@
+sleep 400
+fork 2
+sleep 100
+exit 5 0
+wait 2 5

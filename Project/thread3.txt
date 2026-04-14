@@ -1,0 +1,5 @@
+sleep 300
+fork 1
+sleep 100
+kill 4
+wait 1 4
